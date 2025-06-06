@@ -1,0 +1,71 @@
+
+package com.waterjar.customerservice.service;
+
+import com.waterjar.customerservice.dto.CustomerDTO;
+import com.waterjar.customerservice.entity.Customer;
+import com.waterjar.customerservice.exception.ResourceNotFoundException;
+import com.waterjar.customerservice.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class CustomerServiceImpl implements CustomerService {
+
+    @Autowired
+    private CustomerRepository repo;
+
+    private CustomerDTO toDTO(Customer customer) {
+        return CustomerDTO.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .address(customer.getAddress())
+                .phone(customer.getPhone())
+                .build();
+    }
+
+    private Customer toEntity(CustomerDTO dto) {
+        return Customer.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .address(dto.getAddress())
+                .phone(dto.getPhone())
+                .build();
+    }
+
+    @Override
+    public CustomerDTO createCustomer(CustomerDTO dto) {
+        return toDTO(repo.save(toEntity(dto)));
+    }
+
+    @Override
+    public CustomerDTO getCustomer(Long id) {
+        Customer customer = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
+        return toDTO(customer);
+    }
+
+    @Override
+    public List<CustomerDTO> getAllCustomers() {
+        return repo.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public CustomerDTO updateCustomer(Long id, CustomerDTO dto) {
+        Customer existing = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
+        existing.setName(dto.getName());
+        existing.setAddress(dto.getAddress());
+        existing.setPhone(dto.getPhone());
+        return toDTO(repo.save(existing));
+    }
+
+    @Override
+    public void deleteCustomer(Long id) {
+        Customer existing = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + id));
+        repo.delete(existing);
+    }
+}
