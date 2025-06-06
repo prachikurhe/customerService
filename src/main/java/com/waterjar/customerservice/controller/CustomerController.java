@@ -15,7 +15,7 @@ public class CustomerController {
 
     @Autowired
     private CustomerService service;
-
+//This method used for create the customer
     @PostMapping
     public ResponseEntity<CustomerDTO> create(@RequestBody CustomerDTO dto) {
         return ResponseEntity.ok(service.createCustomer(dto));
