@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
-
+    public void greet() {
+        System.out.println("Hello from mypr1 branch");
+    }
     @Autowired
     private CustomerRepository repo;
 
